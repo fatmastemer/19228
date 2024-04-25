@@ -89,3 +89,27 @@ void loop() {
 
   delay(1000);
 }
+#include <SoftwareSerial.h>
+
+SoftwareSerial BTSerial(10, 11);  // RX, TX pins of HC-06 module
+
+void setup() {
+  Serial.begin(9600);  // Serial monitor connection
+  BTSerial.begin(9600);  // Bluetooth module connection
+
+  Serial.println("Bluetooth Module HC-06 connected!");
+}
+
+void loop() {
+  // Read data from Bluetooth module
+  if (BTSerial.available()) {
+    char data = BTSerial.read();
+    Serial.print(data);
+  }
+
+  // Send data to Bluetooth module
+  if (Serial.available()) {
+    char data = Serial.read();
+    BTSerial.print(data);
+  }
+}
