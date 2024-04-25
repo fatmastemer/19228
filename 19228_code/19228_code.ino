@@ -4,11 +4,17 @@ const int motorPin = 13;
 const int minLdrValue = 0;
 const int maxLdrValue = 100;
 const int led1 = 3, led2 = 4, led3 = 5, led4 = 6, led5 = 7, led6 = 8, led7 = 9, led8 = 10, led9 = 11;
+#include <SoftwareSerial.h>
+SoftwareSerial BTSerial(2, 3);
 void setup() {
   Serial.begin(9600);
   pinMode(led1, OUTPUT), pinMode(led2, OUTPUT), pinMode(led3, OUTPUT), pinMode(led4, OUTPUT), pinMode(led5, OUTPUT), pinMode(led6, OUTPUT), pinMode(led7, OUTPUT), pinMode(led8, OUTPUT), pinMode(led9, OUTPUT);
   pinMode(ldrPin, INPUT);
   pinMode(motorPin, OUTPUT);
+
+  // Bluetooth module setup
+  BTSerial.begin(9600);  // Bluetooth module connection
+  Serial.println("Bluetooth Module HC-06 connected!");
 }
 
 void loop() {
@@ -32,6 +38,7 @@ void loop() {
   Serial.print("LDR Percentage = ");
   Serial.print(ldrStatus);
   Serial.println("%");
+
   if (ldrStatus <= (maxLdrValue * 1 / 4)) {
     digitalWrite(led1, HIGH);
     digitalWrite(led2, HIGH);
@@ -81,35 +88,8 @@ void loop() {
   if (moisturePercentage < 40) {
     Serial.println("Start pump");
     digitalWrite(motorPin, HIGH);
-
   } else {
     Serial.println("Stop pump");
     digitalWrite(motorPin, LOW);
-  }
-
-  delay(1000);
-}
-#include <SoftwareSerial.h>
-
-SoftwareSerial BTSerial(10, 11);  // RX, TX pins of HC-06 module
-
-void setup() {
-  Serial.begin(9600);  // Serial monitor connection
-  BTSerial.begin(9600);  // Bluetooth module connection
-
-  Serial.println("Bluetooth Module HC-06 connected!");
-}
-
-void loop() {
-  // Read data from Bluetooth module
-  if (BTSerial.available()) {
-    char data = BTSerial.read();
-    Serial.print(data);
-  }
-
-  // Send data to Bluetooth module
-  if (Serial.available()) {
-    char data = Serial.read();
-    BTSerial.print(data);
   }
 }
