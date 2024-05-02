@@ -4,6 +4,7 @@ const int motorPin = 13;
 const int minLdrValue = 800;
 const int maxLdrValue = 2300;
 const int led1 = 2, led2 = 3, led3 = 4, led4 = 5, led5 = 6, led6 = 7;
+char *led_state, *pump_state;
 #include <SoftwareSerial.h>
 SoftwareSerial BTSerial(2, 3);
 void setup() {
@@ -14,7 +15,7 @@ void setup() {
 
   // Bluetooth module setup
   BTSerial.begin(9600);  // Bluetooth module connection
-  Serial.println("Bluetooth Module HC-06 connected!");
+  // Serial.println("Bluetooth Module HC-06 connected!");
 }
 
 void loop() {
@@ -23,9 +24,8 @@ void loop() {
   int sensorAnalog;
   sensorAnalog = analogRead(sensorPin);
   moisturePercentage = 100.0 - (sensorAnalog / 1023.0) * 100.0;
-  Serial.print("Moisture Percentage = ");
-  Serial.print(moisturePercentage);
-  Serial.println("%");
+  // Serial.print("Moisture Percentage = ");
+
 
   // Light-dependent resistor (LDR) and LED
   int ldrStatus = analogRead(ldrPin);
@@ -33,11 +33,16 @@ void loop() {
   ldrVolt /= 1023;
   double ldrR = (ldrVolt * 70) / (5 - ldrVolt);
   double lux = 500 / pow(ldrR, -0.25);
-  Serial.print("Lux : ");
-  Serial.println(lux);
-  Serial.print("ldrR = ");
-  Serial.println(ldrR);
+  // Serial.print("Lux : ");
 
+  // Serial.print(moisturePercentage);
+  // Serial.print("\n");
+
+  // Serial.print(lux);
+  // Serial.print("\n");
+
+  // Serial.print(ldrR);
+  // Serial.print("\n");
 
   if (lux <= (maxLdrValue * 1 / 4)) {
     digitalWrite(led1, HIGH);
@@ -46,7 +51,7 @@ void loop() {
     digitalWrite(led4, HIGH);
     digitalWrite(led5, HIGH);
     digitalWrite(led6, HIGH);
-    Serial.println("All LEDs are ON");
+    led_state = "All_ON";
   } else if (lux <= (maxLdrValue * 2 / 4)) {
     digitalWrite(led1, HIGH);
     digitalWrite(led2, HIGH);
@@ -54,7 +59,7 @@ void loop() {
     digitalWrite(led4, HIGH);
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
-    Serial.println("1/3 LEDs are OFF");
+    led_state = "Two_OFF";
   } else if (lux <= (maxLdrValue * 3 / 4)) {
     digitalWrite(led1, LOW);
     digitalWrite(led2, LOW);
@@ -62,7 +67,7 @@ void loop() {
     digitalWrite(led4, LOW);
     digitalWrite(led5, HIGH);
     digitalWrite(led6, HIGH);
-    Serial.println("1/3 LEDs are ON");
+    led_state = "Two_ON";
   } else {
     digitalWrite(led1, LOW);
     digitalWrite(led2, LOW);
@@ -70,16 +75,25 @@ void loop() {
     digitalWrite(led4, LOW);
     digitalWrite(led5, LOW);
     digitalWrite(led6, LOW);
-    Serial.println("all LEDs are OFF");
+    led_state = "All_OFF";
   }
 
   // Motor control based on soil moisture
+
   if (moisturePercentage < 40) {
-    Serial.println("Start pump");
+    pump_state = "ON";
     digitalWrite(motorPin, HIGH);
   } else {
-    Serial.println("Stop pump");
+    pump_state = "OFF";
     digitalWrite(motorPin, LOW);
   }
+  Serial.print((int)lux);
+  Serial.print("\n");
+  Serial.print(led_state);
+  Serial.print("\n");
+  Serial.print(moisturePercentage);
+  Serial.print("\n");
+  Serial.print(pump_state);
+  Serial.print("\n");
   delay(1000);
 }
